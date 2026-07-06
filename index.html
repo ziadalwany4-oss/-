@@ -84,7 +84,7 @@ p{
 <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
 <script>
-  // ده سيرفر جاهز أنا عملتهولك مخصوص عشان يشتغل فوراً من غير ما تتعب نفسك
+  // السيرفر الجاهز والمفتوح ليك
   const firebaseConfig = {
     databaseURL: "https://ziad-project-default-rtdb.firebaseio.com/"
   };
@@ -101,7 +101,7 @@ p{
 
   let editKey = null;
 
-  // قراءة وعرض البيانات لايف من السيرفر عند كل الناس
+  // دالة قراءة وعرض البيانات تلقائياً أول ما الصفحة تفتح
   database.ref('products').on('value', function(snapshot) {
       ProductList.innerHTML = '';
       if (snapshot.exists()) {
@@ -120,8 +120,10 @@ p{
               `;
           });
       } else {
-          ProductList.innerHTML = '<p>No products found.</p>';
+          ProductList.innerHTML = '<p style="margin-left:20px;">No products found أكتب منتجاً لحفظه أونلاين</p>';
       }
+  }, function(error) {
+      console.log("Error: " + error.code);
   });
         
   srcbutton.addEventListener("click" , function() {
