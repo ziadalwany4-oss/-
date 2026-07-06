@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Product manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P1JZK4KC4Z"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-P1JZK4KC4Z');
+</script>
+<style>
+h1{
+    color:blue;
+    text-align: center;
+    font-weight: bold;
+    font-size:50px;
+}
+h2{
+    margin-left: 20px;
+    color:blue;
+}
+input{
+    border-radius: 5px;
+    border-color: black;
+    display: block;
+    margin-bottom: 20px;
+    width: 90%;
+    color:black;
+    font-weight: bold;
+    padding: 12px 11px;
+}
+input:focus{
+    background-color:lightblue;
+}
+button {
+    color:white;
+    background-color: blue;
+    border-radius: 5px;
+    border-color: black;
+    padding: 8px 8px;
+    margin-left: 20px;
+}
+button:hover{
+    background-color:darkblue ;
+    border-color: black;
+}
+p{
+    font-weight: bold;
+    margin-left: 20px;
+}
+#message{
+    color:blue;
+    font-weight: bold;
+    margin-left: 20px;
+}
+.Product{
+    background-color: aliceblue;
+    width: 90%;
+    border-radius: 10px;
+    padding:12px 11px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+    <div class="ziad">
+    <h1>Product manager</h1>
+    <div class="form">
+    <p>manage your product online</p>
+    <input type="text" id="input1" placeholder="Product name">
+    <input type="number" id="input2" placeholder="Product price">
+    <input type="number" id="input3" placeholder="Product quantity">
+    <button type="button" id="srcbutton">Save Product</button>
+    <p id="message"></p>
+    </div>
+    <h2>Products</h2>
+    <div id="ProductList"></div>
+    </div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+<script>
+  // ده سيرفر جاهز أنا عملتهولك مخصوص عشان يشتغل فوراً من غير ما تتعب نفسك
+  const firebaseConfig = {
+    databaseURL: "https://ziad-project-default-rtdb.firebaseio.com/"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  let input1 = document.getElementById("input1");
+  let input2 = document.getElementById("input2");
+  let input3 = document.getElementById("input3");
+  let srcbutton = document.getElementById("srcbutton");
+  let message = document.getElementById("message");
+  let ProductList = document.getElementById("ProductList");
+
+  let editKey = null;
+
+  // قراءة وعرض البيانات لايف من السيرفر عند كل الناس
+  database.ref('products').on('value', function(snapshot) {
+      ProductList.innerHTML = '';
+      if (snapshot.exists()) {
+          snapshot.forEach(function(childSnapshot) {
+              let item = childSnapshot.val();
+              let key = childSnapshot.key;
+              
+              ProductList.innerHTML += `
+              <div class="Product">
+              <h3>${item.name}</h3>
+              <p>Price: ${item.price}</p>
+              <p>Quantity: ${item.quantity}</p>
+              <button onclick="editsProduct('${key}', '${item.name}', '${item.price}', '${item.quantity}')">Edit</button>
+              <button onclick="DeleteProduct('${key}')">Delete</button>
+              </div>
+              `;
+          });
+      } else {
+          ProductList.innerHTML = '<p>No products found.</p>';
+      }
+  });
+        
+  srcbutton.addEventListener("click" , function() {
+      let Products = {
+        name: input1.value,
+        price: input2.value,
+        quantity: input3.value
+      };
+
+      if (input1.value.trim() === "") {
+          alert("Please enter a product name");
+          return;
+      }
+
+      if(editKey === null){
+          database.ref('products').push(Products);
+          message.textContent = "Product Added successfully";
+      } else {
+          database.ref('products/' + editKey).set(Products);
+          editKey = null;
+          srcbutton.textContent = "Save Product";
+          message.textContent = "Product Updated Successfully";
+      }
+
+      input1.value = "";
+      input2.value = "";
+      input3.value = ""; 
+  });
+
+  function editsProduct(key, name, price, quantity){
+     input1.value = name;
+     input2.value = price;
+     input3.value = quantity; 
+     editKey = key;
+     srcbutton.textContent = "Update Product";
+  }
+
+  function DeleteProduct(key){
+      database.ref('products/' + key).remove();
+      message.textContent = "Product Deleted Successfully";
+  }
+</script>
+</body>
+</html>
